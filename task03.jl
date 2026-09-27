@@ -8,5 +8,5 @@ function task3!(r)
     from_corner!(r, nw, ns)
 end
 
-# r = Robot("fields/task03.sit", animate = true)
-# task3!(r)
+r = Robot("fields/task03.sit", animate = true)
+task3!(r)

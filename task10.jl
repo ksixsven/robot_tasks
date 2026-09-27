@@ -9,5 +9,5 @@ function task10!(r)
     return c.k
 end
 
-# r = Robot("fields/task10.sit", animate = true)
-# println(task10!(r))
+r = Robot("fields/task10.sit", animate = true)
+println(task10!(r))

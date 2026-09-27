@@ -7,5 +7,5 @@ function task4!(r)
     back_from_snake!(r, up, nw, ns)
 end
 
-# r = Robot("fields/task04.sit", animate = true)
-# task4!(r)
+r = Robot("fields/task04.sit", animate = true)
+task4!(r)

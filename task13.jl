@@ -16,5 +16,5 @@ function task13!(r, side)
     move!(r, side)                  # проходим через проход
 end
 
-# r = Robot("fields/task13.sit", animate = true)
-# task13!(r, Nord)
+r = Robot("fields/task13.sit", animate = true)
+task13!(r, Nord)

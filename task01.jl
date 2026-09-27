@@ -8,5 +8,5 @@ function task1!(r)
     putmarker!(r)               # центр креста
 end
 
-# r = Robot("fields/task01.sit", animate = true)
-# task1!(r)
+r = Robot("fields/task01.sit", animate = true)
+task1!(r)
