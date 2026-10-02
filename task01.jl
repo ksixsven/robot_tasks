@@ -8,5 +8,5 @@ function task1!(r)
     putmarker!(r)               # центр креста
 end
 
-r = Robot("fields/task01.sit", animate = true)
+r = Robot(joinpath(@__DIR__, "fields", "task01.sit"), animate = true)
 task1!(r)

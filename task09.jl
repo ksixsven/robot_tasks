@@ -9,5 +9,5 @@ function task9!(r)
     return c.k
 end
 
-r = Robot("fields/task09.sit", animate = true)
+r = Robot(joinpath(@__DIR__, "fields", "task09.sit"), animate = true)
 println(task9!(r))

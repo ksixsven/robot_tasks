@@ -11,5 +11,5 @@ function task5!(r)
     from_corner!(r, nw, ns)
 end
 
-r = Robot("fields/task05.sit", animate = true)
+r = Robot(joinpath(@__DIR__, "fields", "task05.sit"), animate = true)
 task5!(r)

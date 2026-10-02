@@ -79,5 +79,5 @@ function task15!(r)
     end
 end
 
-r = Robot("fields/task15.sit", animate = true)
+r = Robot(joinpath(@__DIR__, "fields", "task15.sit"), animate = true)
 task15!(r)
