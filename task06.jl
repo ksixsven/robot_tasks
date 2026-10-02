@@ -7,5 +7,5 @@ function task6!(r)
     back_from_snake!(r, up, nw, ns)
 end
 
-r = Robot("fields/task06.sit", animate = true)
+r = Robot(joinpath(@__DIR__, "fields", "task06.sit"), animate = true)
 task6!(r)
