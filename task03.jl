@@ -2,11 +2,29 @@
 # (прямоугольники и/или отрезки)
 include("lib.jl")
 
-function task3!(r)
-    nw, ns = to_corner!(r)      # путь в угол с обходом перегородок
-    perimeter!(r, putmarker!)
-    from_corner!(r, nw, ns)
+"""
+task3!(robot)
+
+ДАНО:
+    -- Робот находится в произвольной клетке ограниченного прямоугольного поля.
+    -- Внутри поля есть изолированные перегородки (прямоугольники и/или отрезки),
+       не касающиеся друг друга и внешней рамки; маркеров нет.
+
+РЕЗУЛЬТАТ:
+    -- Робот - в исходном положении (инвариант).
+    -- На поле расставлены маркеры по всему периметру внешней рамки.
+"""
+function task3!(robot)
+    num_west, num_south = to_corner!(robot)   # путь в угол с обходом перегородок
+    #УТВ: Робот - в юго-западном углу
+    walk_perimeter!(robot, putmarker!)
+    #УТВ: периметр замаркирован, Робот - в юго-западном углу
+    from_corner!(robot, num_west, num_south)
+    #УТВ: Робот - в исходном положении
 end
 
-r = Robot(joinpath(@__DIR__, "fields", "task03.sit"), animate = true)
-task3!(r)
+# Запуск: julia task03.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "fields", "task03.sit"), animate = true)
+    task3!(robot)
+end

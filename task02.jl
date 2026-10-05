@@ -1,11 +1,29 @@
 # Задача 2. Замаркировать периметр внешней рамки
 include("lib.jl")
 
-function task2!(r)
-    nw, ns = to_corner!(r)      # без перегородок это просто "до упора на запад и на юг"
-    perimeter!(r, putmarker!)
-    from_corner!(r, nw, ns)
+"""
+task2!(robot)
+
+ДАНО:
+    -- Робот находится в произвольной клетке ограниченного прямоугольного поля
+       без внутренних перегородок и маркеров.
+    -- Поле состоит более чем из одной клетки.
+
+РЕЗУЛЬТАТ:
+    -- Робот - в исходном положении (инвариант).
+    -- На поле расставлены маркеры по всему периметру внешней рамки.
+"""
+function task2!(robot)
+    num_west, num_south = to_corner!(robot)   # без перегородок это просто "до упора на запад и на юг"
+    #УТВ: Робот - в юго-западном углу
+    walk_perimeter!(robot, putmarker!)
+    #УТВ: периметр замаркирован, Робот - в юго-западном углу
+    from_corner!(robot, num_west, num_south)
+    #УТВ: Робот - в исходном положении
 end
 
-r = Robot(joinpath(@__DIR__, "fields", "task02.sit"), animate = true)
-task2!(r)
+# Запуск: julia task02.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "fields", "task02.sit"), animate = true)
+    task2!(robot)
+end
