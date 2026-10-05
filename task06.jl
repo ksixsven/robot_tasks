@@ -1,11 +1,29 @@
 # Задача 6. Замаркировать всё поле при наличии внутренних перегородок
 include("lib.jl")
 
-function task6!(r)
-    nw, ns = to_corner!(r)
-    up = snake!(r, putmarker!)
-    back_from_snake!(r, up, nw, ns)
+"""
+task6!(robot)
+
+ДАНО:
+    -- Робот находится в произвольной клетке ограниченного прямоугольного поля.
+    -- Внутри поля есть изолированные перегородки (прямоугольники и/или отрезки),
+       не касающиеся друг друга и внешней рамки; маркеров нет.
+
+РЕЗУЛЬТАТ:
+    -- Робот - в исходном положении (инвариант).
+    -- Во всех клетках поля, до которых Робот может дойти, стоят маркеры.
+"""
+function task6!(robot)
+    num_west, num_south = to_corner!(robot)
+    #УТВ: Робот - в юго-западном углу
+    num_up = walk_snake!(robot, putmarker!)
+    #УТВ: Робот - в верхнем ряду, все доступные клетки замаркированы
+    back_from_snake!(robot, num_up, num_west, num_south)
+    #УТВ: Робот - в исходном положении
 end
 
-r = Robot(joinpath(@__DIR__, "fields", "task06.sit"), animate = true)
-task6!(r)
+# Запуск: julia task06.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "fields", "task06.sit"), animate = true)
+    task6!(robot)
+end
