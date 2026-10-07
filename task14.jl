@@ -1,5 +1,6 @@
 # Задача 14. Поиск маркера на неограниченном поле (спираль)
-include("lib.jl")
+
+using HorizonSideRobots
 
 """
 task14!(robot)
@@ -39,6 +40,15 @@ function move_until_marker!(robot, side, num_steps)
         move!(robot, side)
     end
 end
+
+#----------------------------------------------------------------------
+
+"""
+left(side::HorizonSide)::HorizonSide
+
+Возвращает направление налево относительно заданного
+"""
+left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
 
 # Запуск: julia task14.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)

@@ -1,5 +1,6 @@
 # Задача 13. Поиск прохода в бесконечной перегородке
-include("lib.jl")
+
+using HorizonSideRobots
 
 """
 task13!(robot, side)
@@ -31,6 +32,24 @@ function task13!(robot, side)
     #УТВ: Робот напротив прохода
     move!(robot, side)
 end
+
+#----------------------------------------------------------------------
+
+"""
+left(side::HorizonSide)::HorizonSide
+
+Возвращает направление налево относительно заданного
+"""
+left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
+
+#----------------------------------------------------------------------
+
+"""
+inverse(side::HorizonSide)::HorizonSide
+
+Возвращает направление, противоположное заданному
+"""
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
 
 # Запуск: julia task13.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)
