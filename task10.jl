@@ -1,5 +1,6 @@
 # Задача 10. Подсчитать маркеры на всём поле (без перегородок)
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -24,8 +25,6 @@ function task10!(robot)
     return snake.total
 end
 
-#----------------------------------------------------------------------
-
 """
 back_from_snake!(robot, num_up, num_west, num_south)
 
@@ -45,8 +44,6 @@ function back_from_snake!(robot, num_up, num_west, num_south)
     move_bypass!(robot, Ost, num_west)
 end
 
-#----------------------------------------------------------------------
-
 """
 move_to_frame!(robot, side)
 
@@ -57,8 +54,6 @@ function move_to_frame!(robot, side)
         move!(robot, side)
     end
 end
-
-#----------------------------------------------------------------------
 
 """
 to_corner!(robot)
@@ -93,8 +88,6 @@ function to_corner!(robot)
     #УТВ: Робот - в юго-западном углу
     return (num_west = num_west, num_south = num_south)
 end
-
-#----------------------------------------------------------------------
 
 """
 walk_snake!(robot, act)
@@ -134,8 +127,6 @@ function walk_snake!(robot, act)
     return (num_up = num_up, total = total)
 end
 
-#----------------------------------------------------------------------
-
 """
 move_bypass!(robot, side)
 
@@ -168,8 +159,6 @@ function move_bypass!(robot, side, num_steps)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 pass_wall!(robot, side, d, num_steps)
 
@@ -193,8 +182,6 @@ function pass_wall!(robot, side, d, num_steps)
     return num_advance
 end
 
-#----------------------------------------------------------------------
-
 """
 along_wall!(robot, side, d)
 
@@ -210,8 +197,6 @@ function along_wall!(robot, side, d)
     return num_steps
 end
 
-#----------------------------------------------------------------------
-
 """
 move!(robot, side, num_steps)
 
@@ -224,16 +209,12 @@ function move!(robot, side, num_steps)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 left(side::HorizonSide)::HorizonSide
 
 Возвращает направление налево относительно заданного
 """
 left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
-
-#----------------------------------------------------------------------
 
 """
 walk_to_frame!(robot, side, act)
@@ -253,16 +234,12 @@ function walk_to_frame!(robot, side, act)
     return (num_steps = num_steps, total = total)
 end
 
-#----------------------------------------------------------------------
-
 """
 inverse(side::HorizonSide)::HorizonSide
 
 Возвращает направление, противоположное заданному
 """
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
-
-#----------------------------------------------------------------------
 
 """
 count_marker(robot)

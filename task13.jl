@@ -1,5 +1,6 @@
 # Задача 13. Поиск прохода в бесконечной перегородке
 
+using GLMakie
 using HorizonSideRobots
 
 """
@@ -33,16 +34,12 @@ function task13!(robot, side)
     move!(robot, side)
 end
 
-#----------------------------------------------------------------------
-
 """
 left(side::HorizonSide)::HorizonSide
 
 Возвращает направление налево относительно заданного
 """
 left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
-
-#----------------------------------------------------------------------
 
 """
 inverse(side::HorizonSide)::HorizonSide

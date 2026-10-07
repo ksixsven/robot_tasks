@@ -1,6 +1,7 @@
 # Задача 11. Подсчитать маркеры по периметрам внешней и внутренней рамок
 # (клетка, общая для обоих периметров, считается один раз)
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -33,8 +34,6 @@ function task11!(robot)
     return num_markers
 end
 
-#----------------------------------------------------------------------
-
 """
 walk_around_inner!(robot, act; skip_frame = false)
 
@@ -62,16 +61,12 @@ function walk_around_inner!(robot, act; skip_frame = false)
     return total
 end
 
-#----------------------------------------------------------------------
-
 """
 on_frame(robot, side)
 
 Клетка с Роботом у внешней рамки? (стена со стороны left(side) - это внутренняя рамка)
 """
 on_frame(robot, side) = any(s -> s != left(side) && isborder(robot, s), (Nord, West, Sud, Ost))
-
-#----------------------------------------------------------------------
 
 """
 move_to_inner_frame!(robot)
@@ -102,8 +97,6 @@ function move_to_inner_frame!(robot)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 from_corner!(robot, num_west, num_south)
 
@@ -117,8 +110,6 @@ function from_corner!(robot, num_west, num_south)
     move!(robot, Nord, num_south)
     move_bypass!(robot, Ost, num_west)
 end
-
-#----------------------------------------------------------------------
 
 """
 move_bypass!(robot, side)
@@ -152,16 +143,12 @@ function move_bypass!(robot, side, num_steps)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 left(side::HorizonSide)::HorizonSide
 
 Возвращает направление налево относительно заданного
 """
 left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
-
-#----------------------------------------------------------------------
 
 """
 to_corner!(robot)
@@ -197,8 +184,6 @@ function to_corner!(robot)
     return (num_west = num_west, num_south = num_south)
 end
 
-#----------------------------------------------------------------------
-
 """
 pass_wall!(robot, side, d, num_steps)
 
@@ -222,8 +207,6 @@ function pass_wall!(robot, side, d, num_steps)
     return num_advance
 end
 
-#----------------------------------------------------------------------
-
 """
 move!(robot, side, num_steps)
 
@@ -236,16 +219,12 @@ function move!(robot, side, num_steps)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 inverse(side::HorizonSide)::HorizonSide
 
 Возвращает направление, противоположное заданному
 """
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
-
-#----------------------------------------------------------------------
 
 """
 along_wall!(robot, side, d)
@@ -261,8 +240,6 @@ function along_wall!(robot, side, d)
     end
     return num_steps
 end
-
-#----------------------------------------------------------------------
 
 """
 walk_perimeter!(robot, act)
@@ -288,8 +265,6 @@ function walk_perimeter!(robot, act)
     return total
 end
 
-#----------------------------------------------------------------------
-
 """
 move_to_frame!(robot, side)
 
@@ -300,8 +275,6 @@ function move_to_frame!(robot, side)
         move!(robot, side)
     end
 end
-
-#----------------------------------------------------------------------
 
 """
 count_marker(robot)

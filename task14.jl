@@ -1,5 +1,6 @@
 # Задача 14. Поиск маркера на неограниченном поле (спираль)
 
+using GLMakie
 using HorizonSideRobots
 
 """
@@ -40,8 +41,6 @@ function move_until_marker!(robot, side, num_steps)
         move!(robot, side)
     end
 end
-
-#----------------------------------------------------------------------
 
 """
 left(side::HorizonSide)::HorizonSide
