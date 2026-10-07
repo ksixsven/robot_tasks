@@ -1,6 +1,7 @@
 # Задача 15. Поиск маркера на неограниченном поле с перегородками
 # (отрезки, лучи, прямоугольники) - спираль с обходом перегородок.
-include("lib.jl")
+
+using HorizonSideRobots
 
 """
 task15!(robot)
@@ -133,6 +134,33 @@ function coord(position, side)
     dx, dy = delta(side)
     return dx * position[1] + dy * position[2]
 end
+
+#----------------------------------------------------------------------
+
+"""
+right(side::HorizonSide)::HorizonSide
+
+Возвращает направление направо относительно заданного
+"""
+right(side::HorizonSide) = HorizonSide(mod(Int(side) + 3, 4))
+
+#----------------------------------------------------------------------
+
+"""
+left(side::HorizonSide)::HorizonSide
+
+Возвращает направление налево относительно заданного
+"""
+left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
+
+#----------------------------------------------------------------------
+
+"""
+inverse(side::HorizonSide)::HorizonSide
+
+Возвращает направление, противоположное заданному
+"""
+inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
 
 # Запуск: julia task15.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)
