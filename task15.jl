@@ -14,17 +14,17 @@ task15!(robot)
     -- Робот стоит в клетке с маркером.
 
 Робот идёт по раскручивающейся спирали, обходя перегородки, и помнит свои
-координаты position = [x, y] относительно старта.
+координаты относительно старта в неизменяемом именованном кортеже
+position = (x = ..., y = ...): каждый шаг возвращает новую позицию.
 """
 function task15!(robot)
-    position = [0, 0]
+    position = (x = 0, y = 0)
     prev_side, prev_target = Ost, 0     # предыдущий отрезок спирали
     target = 1                          # координата конца очередных отрезков
     #ИНВАРИАНТ: маркер не найден в клетках, пройденных по спирали
-    found = false
-    while !found
+    while !ismarker(robot)
         for side in (Nord, West, Sud, Ost)
-            found = found || move_leg!(robot, side, target, prev_side, prev_target, position)
+            position = move_leg!(robot, side, target, prev_side, prev_target, position)
             prev_side, prev_target = side, target
         end
         target += 1
@@ -35,23 +35,23 @@ end
 move_leg!(robot, side, target, prev_side, prev_target, position)
 
 ДАНО:
-    -- Робот на спирали; prev_side, prev_target - направление и конечная
-       координата предыдущего отрезка спирали.
+    -- Робот на спирали в позиции position; prev_side, prev_target -
+       направление и конечная координата предыдущего отрезка спирали.
 
 РЕЗУЛЬТАТ:
     -- Робот дошёл в направлении side до координаты target (или остановился
-       раньше, найдя маркер); возвращено true, если найден маркер.
+       раньше, найдя маркер); возвращена его новая позиция.
     -- Если обход прямоугольника увёл Робота за угол спирали, он сначала
        возвращается на линию предыдущего отрезка.
 """
 function move_leg!(robot, side, target, prev_side, prev_target, position)
-    return_to_line!(robot, prev_side, prev_target, position)
-    #ИНВАРИАНТ: маркер в клетке Робота не найден (или найден - тогда цикл не идёт)
+    position = return_to_line!(robot, prev_side, prev_target, position)
+    #ИНВАРИАНТ: в клетке Робота маркера нет и отрезок не закончен
     while !ismarker(robot) && coord(position, side) < target
-        step_bypass!(robot, side, position)
-        return_to_line!(robot, prev_side, prev_target, position)
+        position = step_bypass!(robot, side, position)
+        position = return_to_line!(robot, prev_side, prev_target, position)
     end
-    return ismarker(robot)
+    return position
 end
 
 """
@@ -59,11 +59,13 @@ return_to_line!(robot, prev_side, prev_target, position)
 
 Возвращает Робота к линии предыдущего отрезка спирали (если обход прямоугольника
 увёл его дальше), останавливаясь, если найден маркер или впереди рамка прямоугольника.
+Возвращает новую позицию.
 """
 function return_to_line!(robot, prev_side, prev_target, position)
     while !ismarker(robot) && coord(position, prev_side) > prev_target && !isborder(robot, inverse(prev_side))
-        go!(robot, inverse(prev_side), position)
+        position = go!(robot, inverse(prev_side), position)
     end
+    return position
 end
 
 """
@@ -71,19 +73,18 @@ step_bypass!(robot, side, position)
 
 Делает шаг в направлении side с обходом перегородки.
 Конец перегородки ищется "челноком" в обе стороны (нужно для лучей).
-Робот возвращается на исходную линию, координаты position обновляются.
+Робот возвращается на исходную линию; возвращена новая позиция.
 """
 function step_bypass!(robot, side, position)
     if !isborder(robot, side)
-        go!(robot, side, position)
-        return
+        return go!(robot, side, position)
     end
     d = left(side)
     num_steps = 1
     shift = 0                   # смещение вдоль перегородки (+ налево, - направо)
     while isborder(robot, side)
         for _ in 1:num_steps
-            go!(robot, d, position)
+            position = go!(robot, d, position)
             shift += d == left(side) ? 1 : -1
             if !isborder(robot, side) break end
         end
@@ -91,13 +92,14 @@ function step_bypass!(robot, side, position)
         num_steps *= 2          # удвоение длины захода, как в задаче 13
     end
     back = shift > 0 ? right(side) : left(side)
-    go!(robot, side, position)
+    position = go!(robot, side, position)
     while isborder(robot, back) # для прямоугольника - идём вдоль его стороны
-        go!(robot, side, position)
+        position = go!(robot, side, position)
     end
     for _ in 1:abs(shift)       # возвращаемся на исходную линию
-        go!(robot, back, position)
+        position = go!(robot, back, position)
     end
+    return position
 end
 
 #-----------------------------------------------------------------------
@@ -116,13 +118,13 @@ delta(side) = DELTA[Int(side) + 1]
 """
 go!(robot, side, position)
 
-Делает шаг в направлении side и обновляет координаты position = [x, y]
+Делает шаг в направлении side и возвращает новую позицию
+(position - неизменяемый кортеж (x = ..., y = ...))
 """
 function go!(robot, side, position)
     move!(robot, side)
     dx, dy = delta(side)
-    position[1] += dx
-    position[2] += dy
+    return (x = position.x + dx, y = position.y + dy)
 end
 
 """
@@ -132,7 +134,7 @@ coord(position, side)
 """
 function coord(position, side)
     dx, dy = delta(side)
-    return dx * position[1] + dy * position[2]
+    return dx * position.x + dy * position.y
 end
 
 #----------------------------------------------------------------------

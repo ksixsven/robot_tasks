@@ -17,9 +17,9 @@ task4!(robot)
 function task4!(robot)
     num_west, num_south = to_corner!(robot)
     #УТВ: Робот - в юго-западном углу
-    num_up = walk_snake!(robot, putmarker!)
+    snake = walk_snake!(robot, mark_cell!)
     #УТВ: Робот - в верхнем ряду, все клетки замаркированы
-    back_from_snake!(robot, num_up, num_west, num_south)
+    back_from_snake!(robot, snake.num_up, num_west, num_south)
     #УТВ: Робот - в исходном положении
 end
 
@@ -67,8 +67,8 @@ to_corner!(robot)
 
 РЕЗУЛЬТАТ:
     -- Робот в юго-западном углу;
-    -- возвращён кортеж (число вызовов move_bypass! на запад, число шагов на юг) -
-       по нему путь назад находит from_corner!.
+    -- возвращён именованный кортеж (num_west = число вызовов move_bypass! на запад,
+       num_south = число шагов на юг) - по нему путь назад находит from_corner!.
 
 Упёршись в стену, идём вдоль неё на юг, как move_bypass!. Если это рамка,
 Робот при этом уже спустился в угол - возвращаться обратно незачем.
@@ -90,7 +90,7 @@ function to_corner!(robot)
         end
     end
     #УТВ: Робот - в юго-западном углу
-    return num_west, num_south
+    return (num_west = num_west, num_south = num_south)
 end
 
 #----------------------------------------------------------------------
@@ -105,29 +105,32 @@ walk_snake!(robot, act)
 РЕЗУЛЬТАТ:
     -- act(robot) выполнено во всех клетках, доступных Роботу;
     -- Робот - в верхнем ряду поля;
-    -- возвращено число подъёмов на север (высота поля минус 1).
+    -- возвращён именованный кортеж (num_up = число подъёмов на север
+       (высота поля минус 1), total = сумма значений act).
 
 Нижний ряд всегда свободен - по нему узнаём ширину поля, а в остальных рядах
 идём по счётчику столбца и не тратим шаги на выяснение у края ряда,
 перегородка впереди или рамка.
 """
 function walk_snake!(robot, act)
-    act(robot)
-    width = nsteps_move_to_frame!(robot, Ost, act)   # столбцы x = 0..width
+    total = act(robot)
+    row = walk_to_frame!(robot, Ost, act)
+    width = row.num_steps                           # столбцы x = 0..width
+    total += row.total
     x, side, num_up = width, West, 0
     while !isborder(robot, Nord)
         move!(robot, Nord)
         num_up += 1
-        act(robot)
+        total += act(robot)
         target = side == Ost ? width : 0
         while x != target
             k = move_bypass!(robot, side)
             x += side == Ost ? k : -k
-            act(robot)
+            total += act(robot)
         end
         side = inverse(side)
     end
-    return num_up
+    return (num_up = num_up, total = total)
 end
 
 #----------------------------------------------------------------------
@@ -232,36 +235,21 @@ left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
 #----------------------------------------------------------------------
 
 """
-nsteps_move_to_frame!(robot, side)
-
-Перемещает Робота в заданном направлении до внешней рамки
-и возвращает число сделанных шагов
-"""
-function nsteps_move_to_frame!(robot, side)
-    num_steps = 0
-    while !isborder(robot, side)
-        move!(robot, side)
-        num_steps += 1
-    end
-    return num_steps
-end
-
-"""
-nsteps_move_to_frame!(robot, side, act)
+walk_to_frame!(robot, side, act)
 
 Перемещает Робота в заданном направлении до внешней рамки, выполняя act(robot)
-после каждого шага (в стартовой клетке act не выполняется);
-возвращает число сделанных шагов.
-Примеры act: putmarker!, MarkerCounter().
+после каждого шага (в стартовой клетке act не выполняется).
+Возвращает именованный кортеж (num_steps = число шагов, total = сумма значений act).
+Примеры act: mark_cell!, count_marker.
 """
-function nsteps_move_to_frame!(robot, side, act)
-    num_steps = 0
+function walk_to_frame!(robot, side, act)
+    num_steps, total = 0, 0
     while !isborder(robot, side)
         move!(robot, side)
-        act(robot)
+        total += act(robot)
         num_steps += 1
     end
-    return num_steps
+    return (num_steps = num_steps, total = total)
 end
 
 #----------------------------------------------------------------------
@@ -272,6 +260,19 @@ inverse(side::HorizonSide)::HorizonSide
 Возвращает направление, противоположное заданному
 """
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
+
+#----------------------------------------------------------------------
+
+"""
+mark_cell!(robot)
+
+Действие act для расстановки маркеров: ставит маркер в клетке с Роботом.
+Возвращает 0 - клетка не даёт вклада в число, возвращаемое обходом.
+"""
+function mark_cell!(robot)
+    putmarker!(robot)
+    return 0
+end
 
 # Запуск: julia task04.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)

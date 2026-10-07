@@ -19,11 +19,11 @@ task5!(robot)
 function task5!(robot)
     num_west, num_south = to_corner!(robot)
     #УТВ: Робот - в юго-западном углу
-    walk_perimeter!(robot, putmarker!)
+    walk_perimeter!(robot, mark_cell!)
     #УТВ: внешний периметр замаркирован, Робот - в юго-западном углу
     move_to_inner_frame!(robot)
     #УТВ: Робот - рядом с углом внутренней рамки
-    walk_around_inner!(robot, putmarker!)
+    walk_around_inner!(robot, mark_cell!)
     #УТВ: внутренняя рамка замаркирована
     move_to_frame!(robot, Sud)      # назад в юго-западный угол
     move_to_frame!(robot, West)
@@ -44,18 +44,21 @@ walk_around_inner!(robot, act; skip_frame = false)
     -- act(robot) выполнено во всех клетках вокруг внутренней рамки снаружи
        (вместе с угловыми клетками);
     -- при skip_frame = true клетки у внешней рамки пропускаются
-       (они уже учтены при обходе периметра).
+       (они уже учтены при обходе периметра);
+    -- возвращена сумма значений act.
 """
 function walk_around_inner!(robot, act; skip_frame = false)
-    act_here(side) = (skip_frame && on_frame(robot, side)) || act(robot)
+    act_here(side) = (skip_frame && on_frame(robot, side)) ? 0 : act(robot)
+    total = 0
     for side in (Ost, Nord, West, Sud)
         move!(robot, side)
         while isborder(robot, left(side))
-            act_here(side)
+            total += act_here(side)
             move!(robot, side)
         end
-        act_here(side)
+        total += act_here(side)
     end
+    return total
 end
 
 #----------------------------------------------------------------------
@@ -167,8 +170,8 @@ to_corner!(robot)
 
 РЕЗУЛЬТАТ:
     -- Робот в юго-западном углу;
-    -- возвращён кортеж (число вызовов move_bypass! на запад, число шагов на юг) -
-       по нему путь назад находит from_corner!.
+    -- возвращён именованный кортеж (num_west = число вызовов move_bypass! на запад,
+       num_south = число шагов на юг) - по нему путь назад находит from_corner!.
 
 Упёршись в стену, идём вдоль неё на юг, как move_bypass!. Если это рамка,
 Робот при этом уже спустился в угол - возвращаться обратно незачем.
@@ -190,7 +193,7 @@ function to_corner!(robot)
         end
     end
     #УТВ: Робот - в юго-западном углу
-    return num_west, num_south
+    return (num_west = num_west, num_south = num_south)
 end
 
 #----------------------------------------------------------------------
@@ -270,15 +273,18 @@ walk_perimeter!(robot, act)
 РЕЗУЛЬТАТ:
     -- Робот - в юго-западном углу (инвариант);
     -- act(robot) выполнено во всех клетках периметра внешней рамки
-       (угловые клетки - по одному разу)
+       (угловые клетки - по одному разу);
+    -- возвращена сумма значений act
 """
 function walk_perimeter!(robot, act)
+    total = 0
     for side in (Nord, Ost, Sud, West)
         while !isborder(robot, side)
-            act(robot)
+            total += act(robot)
             move!(robot, side)
         end
     end
+    return total
 end
 
 #----------------------------------------------------------------------
@@ -292,6 +298,19 @@ function move_to_frame!(robot, side)
     while !isborder(robot, side)
         move!(robot, side)
     end
+end
+
+#----------------------------------------------------------------------
+
+"""
+mark_cell!(robot)
+
+Действие act для расстановки маркеров: ставит маркер в клетке с Роботом.
+Возвращает 0 - клетка не даёт вклада в число, возвращаемое обходом.
+"""
+function mark_cell!(robot)
+    putmarker!(robot)
+    return 0
 end
 
 # Запуск: julia task05.jl (при запуске из demo.jl и test_all.jl поле создают они сами)

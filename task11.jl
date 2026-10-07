@@ -20,18 +20,17 @@ task11!(robot)
 function task11!(robot)
     num_west, num_south = to_corner!(robot)
     #УТВ: Робот - в юго-западном углу
-    counter = MarkerCounter()
-    walk_perimeter!(robot, counter)
+    num_markers = walk_perimeter!(robot, count_marker)
     #УТВ: маркеры внешнего периметра сосчитаны, Робот - в юго-западном углу
     move_to_inner_frame!(robot)
-    walk_around_inner!(robot, counter; skip_frame = true)
+    num_markers += walk_around_inner!(robot, count_marker; skip_frame = true)
     #УТВ: маркеры внутреннего периметра сосчитаны (клетки у внешней рамки пропущены)
     move_to_frame!(robot, Sud)
     move_to_frame!(robot, West)
     #УТВ: Робот - в юго-западном углу
     from_corner!(robot, num_west, num_south)
     #УТВ: Робот - в исходном положении
-    return counter.num_markers
+    return num_markers
 end
 
 #----------------------------------------------------------------------
@@ -46,18 +45,21 @@ walk_around_inner!(robot, act; skip_frame = false)
     -- act(robot) выполнено во всех клетках вокруг внутренней рамки снаружи
        (вместе с угловыми клетками);
     -- при skip_frame = true клетки у внешней рамки пропускаются
-       (они уже учтены при обходе периметра).
+       (они уже учтены при обходе периметра);
+    -- возвращена сумма значений act.
 """
 function walk_around_inner!(robot, act; skip_frame = false)
-    act_here(side) = (skip_frame && on_frame(robot, side)) || act(robot)
+    act_here(side) = (skip_frame && on_frame(robot, side)) ? 0 : act(robot)
+    total = 0
     for side in (Ost, Nord, West, Sud)
         move!(robot, side)
         while isborder(robot, left(side))
-            act_here(side)
+            total += act_here(side)
             move!(robot, side)
         end
-        act_here(side)
+        total += act_here(side)
     end
+    return total
 end
 
 #----------------------------------------------------------------------
@@ -169,8 +171,8 @@ to_corner!(robot)
 
 РЕЗУЛЬТАТ:
     -- Робот в юго-западном углу;
-    -- возвращён кортеж (число вызовов move_bypass! на запад, число шагов на юг) -
-       по нему путь назад находит from_corner!.
+    -- возвращён именованный кортеж (num_west = число вызовов move_bypass! на запад,
+       num_south = число шагов на юг) - по нему путь назад находит from_corner!.
 
 Упёршись в стену, идём вдоль неё на юг, как move_bypass!. Если это рамка,
 Робот при этом уже спустился в угол - возвращаться обратно незачем.
@@ -192,7 +194,7 @@ function to_corner!(robot)
         end
     end
     #УТВ: Робот - в юго-западном углу
-    return num_west, num_south
+    return (num_west = num_west, num_south = num_south)
 end
 
 #----------------------------------------------------------------------
@@ -272,15 +274,18 @@ walk_perimeter!(robot, act)
 РЕЗУЛЬТАТ:
     -- Робот - в юго-западном углу (инвариант);
     -- act(robot) выполнено во всех клетках периметра внешней рамки
-       (угловые клетки - по одному разу)
+       (угловые клетки - по одному разу);
+    -- возвращена сумма значений act
 """
 function walk_perimeter!(robot, act)
+    total = 0
     for side in (Nord, Ost, Sud, West)
         while !isborder(robot, side)
-            act(robot)
+            total += act(robot)
             move!(robot, side)
         end
     end
+    return total
 end
 
 #----------------------------------------------------------------------
@@ -299,23 +304,12 @@ end
 #----------------------------------------------------------------------
 
 """
-MarkerCounter()
+count_marker(robot)
 
-Счётчик маркеров. Объект вызывается как функция act(robot): если в клетке
-с роботом стоит маркер, число num_markers увеличивается на 1.
-Передаётся в обходы явным параметром (глобальных переменных нет).
+Действие act для подсчёта маркеров: возвращает 1, если в клетке с Роботом
+стоит маркер, и 0 - если нет. Обход суммирует эти значения.
 """
-mutable struct MarkerCounter
-    num_markers::Int
-end
-
-MarkerCounter() = MarkerCounter(0)
-
-function (counter::MarkerCounter)(robot)
-    if ismarker(robot)
-        counter.num_markers += 1
-    end
-end
+count_marker(robot) = Int(ismarker(robot))
 
 # Запуск: julia task11.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)

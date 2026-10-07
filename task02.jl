@@ -18,7 +18,7 @@ task2!(robot)
 function task2!(robot)
     num_west, num_south = to_corner!(robot)   # без перегородок это просто "до упора на запад и на юг"
     #УТВ: Робот - в юго-западном углу
-    walk_perimeter!(robot, putmarker!)
+    walk_perimeter!(robot, mark_cell!)
     #УТВ: периметр замаркирован, Робот - в юго-западном углу
     from_corner!(robot, num_west, num_south)
     #УТВ: Робот - в исходном положении
@@ -93,8 +93,8 @@ to_corner!(robot)
 
 РЕЗУЛЬТАТ:
     -- Робот в юго-западном углу;
-    -- возвращён кортеж (число вызовов move_bypass! на запад, число шагов на юг) -
-       по нему путь назад находит from_corner!.
+    -- возвращён именованный кортеж (num_west = число вызовов move_bypass! на запад,
+       num_south = число шагов на юг) - по нему путь назад находит from_corner!.
 
 Упёршись в стену, идём вдоль неё на юг, как move_bypass!. Если это рамка,
 Робот при этом уже спустился в угол - возвращаться обратно незачем.
@@ -116,7 +116,7 @@ function to_corner!(robot)
         end
     end
     #УТВ: Робот - в юго-западном углу
-    return num_west, num_south
+    return (num_west = num_west, num_south = num_south)
 end
 
 #----------------------------------------------------------------------
@@ -196,15 +196,31 @@ walk_perimeter!(robot, act)
 РЕЗУЛЬТАТ:
     -- Робот - в юго-западном углу (инвариант);
     -- act(robot) выполнено во всех клетках периметра внешней рамки
-       (угловые клетки - по одному разу)
+       (угловые клетки - по одному разу);
+    -- возвращена сумма значений act
 """
 function walk_perimeter!(robot, act)
+    total = 0
     for side in (Nord, Ost, Sud, West)
         while !isborder(robot, side)
-            act(robot)
+            total += act(robot)
             move!(robot, side)
         end
     end
+    return total
+end
+
+#----------------------------------------------------------------------
+
+"""
+mark_cell!(robot)
+
+Действие act для расстановки маркеров: ставит маркер в клетке с Роботом.
+Возвращает 0 - клетка не даёт вклада в число, возвращаемое обходом.
+"""
+function mark_cell!(robot)
+    putmarker!(robot)
+    return 0
 end
 
 # Запуск: julia task02.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
