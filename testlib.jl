@@ -1,6 +1,10 @@
 # Вспомогательные функции для demo.jl, make_fields.jl и test_all.jl:
 # построение полей, ожидаемый результат каждой задачи, текстовая картинка поля.
 using HorizonSideRobots
+
+# Признак для файлов задач: не создавать и не запускать робота при include
+const TESTING = true
+
 import HorizonSideRobots: move!, isborder, putmarker!, ismarker
 
 const Cell = Tuple{Int,Int}
