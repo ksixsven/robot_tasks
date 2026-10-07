@@ -1,5 +1,6 @@
 # Задача 7. Подсчитать маркеры на лучах прямого креста (центр не считается)
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -20,8 +21,6 @@ function task7!(robot)
     #УТВ: Робот - в исходном положении
     return num_markers
 end
-
-#----------------------------------------------------------------------
 
 """
 walk_kross!(robot, act)
@@ -46,8 +45,6 @@ function walk_kross!(robot, act)
     return total
 end
 
-#----------------------------------------------------------------------
-
 """
 walk_to_frame!(robot, side, act)
 
@@ -66,8 +63,6 @@ function walk_to_frame!(robot, side, act)
     return (num_steps = num_steps, total = total)
 end
 
-#----------------------------------------------------------------------
-
 """
 move!(robot, side, num_steps)
 
@@ -80,16 +75,12 @@ function move!(robot, side, num_steps)
     end
 end
 
-#----------------------------------------------------------------------
-
 """
 inverse(side::HorizonSide)::HorizonSide
 
 Возвращает направление, противоположное заданному
 """
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
-
-#----------------------------------------------------------------------
 
 """
 count_marker(robot)

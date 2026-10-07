@@ -1,6 +1,7 @@
 # Задача 15. Поиск маркера на неограниченном поле с перегородками
 # (отрезки, лучи, прямоугольники) - спираль с обходом перегородок.
 
+using GLMakie
 using HorizonSideRobots
 
 """
@@ -102,7 +103,6 @@ function step_bypass!(robot, side, position)
     return position
 end
 
-#-----------------------------------------------------------------------
 # Координаты Робота относительно старта
 
 # Смещение (dx, dy) для Nord, West, Sud, Ost - в порядке значений HorizonSide
@@ -137,8 +137,6 @@ function coord(position, side)
     return dx * position.x + dy * position.y
 end
 
-#----------------------------------------------------------------------
-
 """
 right(side::HorizonSide)::HorizonSide
 
@@ -146,16 +144,12 @@ right(side::HorizonSide)::HorizonSide
 """
 right(side::HorizonSide) = HorizonSide(mod(Int(side) + 3, 4))
 
-#----------------------------------------------------------------------
-
 """
 left(side::HorizonSide)::HorizonSide
 
 Возвращает направление налево относительно заданного
 """
 left(side::HorizonSide) = HorizonSide(mod(Int(side) + 1, 4))
-
-#----------------------------------------------------------------------
 
 """
 inverse(side::HorizonSide)::HorizonSide
