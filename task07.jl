@@ -16,10 +16,9 @@ task7!(robot)
        (маркер в самой центральной клетке не считается).
 """
 function task7!(robot)
-    counter = MarkerCounter()
-    walk_kross!(robot, counter)
+    num_markers = walk_kross!(robot, count_marker)
     #УТВ: Робот - в исходном положении
-    return counter.num_markers
+    return num_markers
 end
 
 #----------------------------------------------------------------------
@@ -34,48 +33,37 @@ walk_kross!(robot, act)
 РЕЗУЛЬТАТ:
     -- Робот - в исходном положении (инвариант);
     -- act(robot) выполнено во всех клетках лучей креста с центром
-       в клетке с роботом (сама центральная клетка не обрабатывается)
+       в клетке с роботом (сама центральная клетка не обрабатывается);
+    -- возвращена сумма значений act
 """
 function walk_kross!(robot, act)
+    total = 0
     for side in (Nord, West, Sud, Ost)
-        num_steps = nsteps_move_to_frame!(robot, side, act)
-        move!(robot, inverse(side), num_steps)
+        ray = walk_to_frame!(robot, side, act)
+        move!(robot, inverse(side), ray.num_steps)
+        total += ray.total
     end
+    return total
 end
 
 #----------------------------------------------------------------------
 
 """
-nsteps_move_to_frame!(robot, side)
-
-Перемещает Робота в заданном направлении до внешней рамки
-и возвращает число сделанных шагов
-"""
-function nsteps_move_to_frame!(robot, side)
-    num_steps = 0
-    while !isborder(robot, side)
-        move!(robot, side)
-        num_steps += 1
-    end
-    return num_steps
-end
-
-"""
-nsteps_move_to_frame!(robot, side, act)
+walk_to_frame!(robot, side, act)
 
 Перемещает Робота в заданном направлении до внешней рамки, выполняя act(robot)
-после каждого шага (в стартовой клетке act не выполняется);
-возвращает число сделанных шагов.
-Примеры act: putmarker!, MarkerCounter().
+после каждого шага (в стартовой клетке act не выполняется).
+Возвращает именованный кортеж (num_steps = число шагов, total = сумма значений act).
+Примеры act: mark_cell!, count_marker.
 """
-function nsteps_move_to_frame!(robot, side, act)
-    num_steps = 0
+function walk_to_frame!(robot, side, act)
+    num_steps, total = 0, 0
     while !isborder(robot, side)
         move!(robot, side)
-        act(robot)
+        total += act(robot)
         num_steps += 1
     end
-    return num_steps
+    return (num_steps = num_steps, total = total)
 end
 
 #----------------------------------------------------------------------
@@ -104,23 +92,12 @@ inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
 #----------------------------------------------------------------------
 
 """
-MarkerCounter()
+count_marker(robot)
 
-Счётчик маркеров. Объект вызывается как функция act(robot): если в клетке
-с роботом стоит маркер, число num_markers увеличивается на 1.
-Передаётся в обходы явным параметром (глобальных переменных нет).
+Действие act для подсчёта маркеров: возвращает 1, если в клетке с Роботом
+стоит маркер, и 0 - если нет. Обход суммирует эти значения.
 """
-mutable struct MarkerCounter
-    num_markers::Int
-end
-
-MarkerCounter() = MarkerCounter(0)
-
-function (counter::MarkerCounter)(robot)
-    if ismarker(robot)
-        counter.num_markers += 1
-    end
-end
+count_marker(robot) = Int(ismarker(robot))
 
 # Запуск: julia task07.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)

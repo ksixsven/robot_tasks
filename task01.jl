@@ -16,7 +16,7 @@ task1!(robot)
        с центром в клетке с роботом.
 """
 function task1!(robot)
-    walk_kross!(robot, putmarker!)
+    walk_kross!(robot, mark_cell!)
     putmarker!(robot)   # центр креста
 end
 
@@ -32,48 +32,37 @@ walk_kross!(robot, act)
 РЕЗУЛЬТАТ:
     -- Робот - в исходном положении (инвариант);
     -- act(robot) выполнено во всех клетках лучей креста с центром
-       в клетке с роботом (сама центральная клетка не обрабатывается)
+       в клетке с роботом (сама центральная клетка не обрабатывается);
+    -- возвращена сумма значений act
 """
 function walk_kross!(robot, act)
+    total = 0
     for side in (Nord, West, Sud, Ost)
-        num_steps = nsteps_move_to_frame!(robot, side, act)
-        move!(robot, inverse(side), num_steps)
+        ray = walk_to_frame!(robot, side, act)
+        move!(robot, inverse(side), ray.num_steps)
+        total += ray.total
     end
+    return total
 end
 
 #----------------------------------------------------------------------
 
 """
-nsteps_move_to_frame!(robot, side)
-
-Перемещает Робота в заданном направлении до внешней рамки
-и возвращает число сделанных шагов
-"""
-function nsteps_move_to_frame!(robot, side)
-    num_steps = 0
-    while !isborder(robot, side)
-        move!(robot, side)
-        num_steps += 1
-    end
-    return num_steps
-end
-
-"""
-nsteps_move_to_frame!(robot, side, act)
+walk_to_frame!(robot, side, act)
 
 Перемещает Робота в заданном направлении до внешней рамки, выполняя act(robot)
-после каждого шага (в стартовой клетке act не выполняется);
-возвращает число сделанных шагов.
-Примеры act: putmarker!, MarkerCounter().
+после каждого шага (в стартовой клетке act не выполняется).
+Возвращает именованный кортеж (num_steps = число шагов, total = сумма значений act).
+Примеры act: mark_cell!, count_marker.
 """
-function nsteps_move_to_frame!(robot, side, act)
-    num_steps = 0
+function walk_to_frame!(robot, side, act)
+    num_steps, total = 0, 0
     while !isborder(robot, side)
         move!(robot, side)
-        act(robot)
+        total += act(robot)
         num_steps += 1
     end
-    return num_steps
+    return (num_steps = num_steps, total = total)
 end
 
 #----------------------------------------------------------------------
@@ -98,6 +87,19 @@ inverse(side::HorizonSide)::HorizonSide
 Возвращает направление, противоположное заданному
 """
 inverse(side::HorizonSide) = HorizonSide(mod(Int(side) + 2, 4))
+
+#----------------------------------------------------------------------
+
+"""
+mark_cell!(robot)
+
+Действие act для расстановки маркеров: ставит маркер в клетке с Роботом.
+Возвращает 0 - клетка не даёт вклада в число, возвращаемое обходом.
+"""
+function mark_cell!(robot)
+    putmarker!(robot)
+    return 0
+end
 
 # Запуск: julia task01.jl (при запуске из demo.jl и test_all.jl поле создают они сами)
 if !isdefined(Main, :TESTING)
