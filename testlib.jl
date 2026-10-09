@@ -117,7 +117,7 @@ end
 
 # Клетки, которые задача должна замаркировать / в которых должна считать маркеры
 function target(k, s::Snapshot)
-    k in (1, 7) && return k == 1 ? cross(s) : setdiff(cross(s), [s.start])
+    k in (1, 7) && return setdiff(cross(s), [s.start])
     k in (2, 3, 8, 9) && return perimeter(s)
     k in (4, 6, 10, 12) && return reachable(s)
     k in (5, 11) && return union(perimeter(s), ring(s))
