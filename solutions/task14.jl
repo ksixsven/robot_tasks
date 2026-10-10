@@ -1,5 +1,6 @@
 # Задача 14. Маркер на неограниченном поле (спираль)
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -22,4 +23,10 @@ function task14!(robot)
         end
         num_steps += 1
     end
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task14.sit"), animate = true)
+    task14!(robot)
 end

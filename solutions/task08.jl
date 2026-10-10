@@ -1,5 +1,6 @@
 # Задача 8. Число маркеров на периметре (без перегородок)
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -103,4 +104,10 @@ function task8!(robot)
     num_markers = walk_perimeter!(robot, count_marker)
     from_corner!(robot, num_west, num_south)
     return num_markers
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task08.sit"), animate = true)
+    println(task8!(robot))
 end

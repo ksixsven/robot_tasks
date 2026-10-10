@@ -1,5 +1,6 @@
 # Задача 6. Всё поле с перегородками
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -130,4 +131,10 @@ function task6!(robot)
     num_west, num_south = to_corner!(robot)
     snake = walk_snake!(robot, mark_cell!)
     back_from_snake!(robot, snake.num_up, num_west, num_south)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task06.sit"), animate = true)
+    task6!(robot)
 end

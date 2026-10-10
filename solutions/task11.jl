@@ -1,5 +1,6 @@
 # Задача 11. Число маркеров на периметрах внешней и внутренней рамок
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -146,4 +147,10 @@ function task11!(robot)
     move_to_frame!(robot, West)
     from_corner!(robot, num_west, num_south)
     return num_markers
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task11.sit"), animate = true)
+    println(task11!(robot))
 end

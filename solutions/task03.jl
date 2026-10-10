@@ -1,5 +1,6 @@
 # Задача 3. Периметр поля с перегородками
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -102,4 +103,10 @@ function task3!(robot)
     num_west, num_south = to_corner!(robot)
     walk_perimeter!(robot, mark_cell!)
     from_corner!(robot, num_west, num_south)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task03.sit"), animate = true)
+    task3!(robot)
 end

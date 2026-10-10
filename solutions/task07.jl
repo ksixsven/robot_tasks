@@ -1,5 +1,6 @@
 # Задача 7. Число маркеров на лучах креста
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -37,4 +38,10 @@ end
 
 function task7!(robot)
     return walk_kross!(robot, count_marker)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task07.sit"), animate = true)
+    println(task7!(robot))
 end

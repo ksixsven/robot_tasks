@@ -1,5 +1,6 @@
 # Задача 10. Число маркеров на поле без перегородок
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -131,4 +132,10 @@ function task10!(robot)
     snake = walk_snake!(robot, count_marker)
     back_from_snake!(robot, snake.num_up, num_west, num_south)
     return snake.total
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task10.sit"), animate = true)
+    println(task10!(robot))
 end

@@ -1,5 +1,6 @@
 # Задача 15. Маркер на неограниченном поле с перегородками
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -80,4 +81,10 @@ function task15!(robot)
         end
         target += 1
     end
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task15.sit"), animate = true)
+    task15!(robot)
 end

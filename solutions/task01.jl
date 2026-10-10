@@ -1,5 +1,6 @@
 # Задача 1. Крест из маркеров с центром в клетке Робота
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -37,4 +38,10 @@ end
 
 function task1!(robot)
     walk_kross!(robot, mark_cell!)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task01.sit"), animate = true)
+    task1!(robot)
 end

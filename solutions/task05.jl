@@ -1,5 +1,6 @@
 # Задача 5. Периметры внешней и внутренней рамок
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -145,4 +146,10 @@ function task5!(robot)
     move_to_frame!(robot, Sud)
     move_to_frame!(robot, West)
     from_corner!(robot, num_west, num_south)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task05.sit"), animate = true)
+    task5!(robot)
 end

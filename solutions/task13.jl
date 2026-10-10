@@ -1,5 +1,6 @@
 # Задача 13. Проход в бесконечной перегородке (поиск "челноком")
 
+using GLMakie
 using HorizonSideRobots
 import HorizonSideRobots: move!
 
@@ -19,4 +20,10 @@ function task13!(robot, side)
         num_steps *= 2
     end
     move!(robot, side)
+end
+
+# Запуск с анимацией на поле-примере из fields/
+if !isdefined(Main, :TESTING)
+    robot = Robot(joinpath(@__DIR__, "..", "fields", "task13.sit"), animate = true)
+    task13!(robot, Nord)
 end
